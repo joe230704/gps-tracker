@@ -1,8 +1,11 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>GPS Tracker Activo</title>
+  <title>Rastreo GPS con Leaflet</title>
   <meta charset="UTF-8" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
+    integrity="sha256-sA+2Fb07x3Jo9GgJvLKfQ4fPv8Q52OxK0oz+MZxg0Zw="
+    crossorigin=""/>
   <style>
     #map {
       height: 90vh;
@@ -14,33 +17,31 @@
   <h2>Rastreo en Tiempo Real</h2>
   <div id="map"></div>
 
+  <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"
+    integrity="sha256-DxPgWbWPlv3OkC2aB9O4dWuXlp9sNPPau8N8C3vJsN4="
+    crossorigin=""></script>
+
   <script>
-    let map, marker;
+    const map = L.map('map').setView([19.4326, -99.1332], 16); // CDMX por defecto
 
-    function initMap() {
-      map = new google.maps.Map(document.getElementById("map"), {
-        zoom: 16,
-        center: { lat: 19.4326, lng: -99.1332 } // CDMX por defecto
-      });
+    // Capa del mapa usando OpenStreetMap
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '© OpenStreetMap'
+    }).addTo(map);
 
-      marker = new google.maps.Marker({
-        position: map.getCenter(),
-        map,
-        title: "Tu ubicación"
-      });
+    const marker = L.marker([19.4326, -99.1332]).addTo(map).bindPopup('Tu ubicación').openPopup();
 
-      trackLocation();
-    }
-
+    // Función para actualizar la ubicación en tiempo real
     function trackLocation() {
       if (navigator.geolocation) {
         navigator.geolocation.watchPosition(
           (position) => {
             const lat = position.coords.latitude;
             const lng = position.coords.longitude;
-            const newPos = { lat, lng };
-            marker.setPosition(newPos);
-            map.setCenter(newPos);
+            const newPos = [lat, lng];
+            marker.setLatLng(newPos);
+            map.setView(newPos, 16);
           },
           (err) => alert("Error obteniendo ubicación: " + err.message),
           { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 }
@@ -49,10 +50,8 @@
         alert("Tu navegador no soporta geolocalización.");
       }
     }
-  </script>
 
-  <script async
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCYb33L0US2kSHT30WicTzXXUuPTTUvyQY&callback=initMap">
+    trackLocation();
   </script>
 </body>
 </html>
