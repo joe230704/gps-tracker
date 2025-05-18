@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Ubicación en Tiempo Real</title>
+  <meta charset="UTF-8" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    #map {
+      height: 90vh;
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+  <h2>Última ubicación registrada</h2>
+  <div id="map"></div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    const map = L.map('map').setView([19.4326, -99.1332], 15); // CDMX por defecto
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    const marker = L.marker([19.4326, -99.1332]).addTo(map);
+
+    fetch('/ultima-ubicacion')
+      .then(res => res.json())
+      .then(data => {
+        if (data.lat && data.lon) {
+          marker.setLatLng([data.lat, data.lon]);
+          map.setView([data.lat, data.lon], 16);
+        } else {
+          alert("Aún no hay ubicación registrada.");
+        }
+      })
+      .catch(err => alert("Error al obtener la ubicación."));
+  </script>
+</body>
+</html>
