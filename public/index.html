@@ -1,22 +1,58 @@
 <!DOCTYPE html>
-<html lang="es">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>GPS Tracker</title>
+  <title>GPS Tracker Activo</title>
+  <meta charset="UTF-8" />
   <style>
-    body {
-      font-family: sans-serif;
-      text-align: center;
-      margin-top: 100px;
-    }
-    h1 {
-      color: #0077cc;
+    #map {
+      height: 90vh;
+      width: 100%;
     }
   </style>
 </head>
 <body>
-  <h1>GPS Tracker Activo</h1>
-  <p>Este servidor está escuchando datos de ubicación.</p>
+  <h2>Rastreo en Tiempo Real</h2>
+  <div id="map"></div>
+
+  <script>
+    let map, marker;
+
+    function initMap() {
+      map = new google.maps.Map(document.getElementById("map"), {
+        zoom: 16,
+        center: { lat: 19.4326, lng: -99.1332 } // CDMX por defecto
+      });
+
+      marker = new google.maps.Marker({
+        position: map.getCenter(),
+        map,
+        title: "Tu ubicación"
+      });
+
+      trackLocation();
+    }
+
+    function trackLocation() {
+      if (navigator.geolocation) {
+        navigator.geolocation.watchPosition(
+          (position) => {
+            const lat = position.coords.latitude;
+            const lng = position.coords.longitude;
+            const newPos = { lat, lng };
+            marker.setPosition(newPos);
+            map.setCenter(newPos);
+          },
+          (err) => alert("Error obteniendo ubicación: " + err.message),
+          { enableHighAccuracy: true, maximumAge: 0, timeout: 5000 }
+        );
+      } else {
+        alert("Tu navegador no soporta geolocalización.");
+      }
+    }
+  </script>
+
+  <script async
+    src="https://maps.googleapis.com/maps/api/js?key=TU_API_KEY&callback=initMap">
+  </script>
 </body>
 </html>
