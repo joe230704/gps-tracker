@@ -7,13 +7,25 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-let ubicaciones = [];
+let ultimaUbicacion = null;
 
 app.post('/guardar-ubicacion', (req, res) => {
-  const { lat, lon, timestamp } = req.body;
-  ubicaciones.push({ lat, lon, timestamp });
-  console.log('Ubicación guardada:', lat, lon, new Date(timestamp));
-  res.sendStatus(200);
+  const { lat, lon } = req.body;
+  if (lat && lon) {
+    ultimaUbicacion = { lat, lon, fecha: new Date() };
+    console.log('Ubicación guardada:', ultimaUbicacion);
+    res.json({ mensaje: 'Ubicación guardada' });
+  } else {
+    res.status(400).json({ mensaje: 'Faltan latitud o longitud' });
+  }
+});
+
+app.get('/ultima-ubicacion', (req, res) => {
+  if (ultimaUbicacion) {
+    res.json(ultimaUbicacion);
+  } else {
+    res.status(404).json({ mensaje: 'No hay ubicación disponible' });
+  }
 });
 
 app.get('/', (req, res) => {
