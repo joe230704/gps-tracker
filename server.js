@@ -4,22 +4,18 @@ const app = express();
 
 const PORT = process.env.PORT || 3000;
 
-// Middleware para parsear JSON
 app.use(express.json());
-
-// Servir archivos estáticos (tu carpeta public)
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Ruta para guardar ubicación (ejemplo)
-app.post('/guardar-ubicacion', (req, res) => {
-  const { lat, lon } = req.body;
-  console.log(`Ubicación recibida: lat=${lat}, lon=${lon}`);
-  // Aquí podrías guardar la ubicación en una base de datos o archivo
+let ubicaciones = [];
 
-  res.json({ mensaje: 'Ubicación guardada' });
+app.post('/guardar-ubicacion', (req, res) => {
+  const { lat, lon, timestamp } = req.body;
+  ubicaciones.push({ lat, lon, timestamp });
+  console.log('Ubicación guardada:', lat, lon, new Date(timestamp));
+  res.sendStatus(200);
 });
 
-// Ruta principal (si quieres mostrar algo simple)
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
